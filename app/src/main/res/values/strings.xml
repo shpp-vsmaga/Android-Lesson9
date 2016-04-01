@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">SQLite</string>
+    <string name="btnLoginlabel">Login</string>
+    <string name="edtUserNameHint">Username</string>
+    <string name="edtPaswordHint">Password</string>
+    <string name="btnRegisterLabel">Register</string>
+    <string name="tvUsernameLabel">Enter your login</string>
+    <string name="tvUsernameMainActivityLabel">Your login</string>
+    <string name="tvLocationMainActivityLabel">Your location</string>
+    <string name="tvPasswordLabel">Enter your password</string>
+    <string name="tvLocationLabel">Select your location</string>
+
+
+
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+</resources>
