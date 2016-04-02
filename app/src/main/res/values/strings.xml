@@ -3,7 +3,7 @@
     <string name="btnLoginlabel">Login</string>
     <string name="edtUserNameHint">Username</string>
     <string name="edtPaswordHint">Password</string>
-    <string name="btnRegisterLabel">Register</string>
+    <string name="btnRegisterLabel">Create account</string>
     <string name="tvUsernameLabel">Enter your login</string>
     <string name="tvUsernameMainActivityLabel">Your login</string>
     <string name="tvLocationMainActivityLabel">Your location</string>

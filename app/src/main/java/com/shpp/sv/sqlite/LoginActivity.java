@@ -1,5 +1,6 @@
 package com.shpp.sv.sqlite;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private void loginSavedUser() {
         String savedUserName = settingsHelper.getLoggedUserName();
         if (!savedUserName.isEmpty()){
-            login(savedUserName);
+            openMainActivity();
         }
     }
 
@@ -89,12 +90,26 @@ public class LoginActivity extends AppCompatActivity {
             login(name);
         }
 
-        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
     }
 
     private void login(String name) {
         settingsHelper.saveLoggedUser(name, dbHelper.getUsersLocation(name));
-        openMainActivity();
+        //openMainActivity();
+
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+                R.style.AppTheme_Dark_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.show();
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        openMainActivity();
+                        progressDialog.dismiss();
+                    }
+                }, 1000);
     }
 
     private void openMainActivity() {

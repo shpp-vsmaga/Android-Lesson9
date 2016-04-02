@@ -22,7 +22,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/edtUserName"
-        android:hint="@string/edtUserNameHint" />
+        android:singleLine="true"
+        android:hint="@string/edtUserNameHint"
+        android:paddingTop="40dp" />
 
     <EditText
         android:layout_width="match_parent"
@@ -42,14 +44,18 @@
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp" />
 
-    <Button
-        android:layout_width="match_parent"
+
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/btnRegisterLabel"
-        android:id="@+id/btnRegister"
-        android:background="@color/colorBackgroundUI"
+        android:id="@+id/tvRegister"
+        android:textColor="@color/colorBackgroundUI"
+        android:textIsSelectable="false"
+        android:textSize="16dp"
         android:onClick="onBtnRegisterClick"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="16dp" />
+        android:paddingTop="20dp"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>
