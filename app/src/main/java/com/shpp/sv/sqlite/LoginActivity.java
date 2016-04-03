@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "svcom";
     private UserDatabaseHelper dbHelper;
     private SettingsHelper settingsHelper;
     private EditText edtUsername;
@@ -46,8 +45,6 @@ public class LoginActivity extends AppCompatActivity {
             ArrayList<String> islands = readIslandsFromFile();
             dbHelper.addIslandsToBase(islands);
         }
-
-
     }
 
     private ArrayList<String> readIslandsFromFile() {
@@ -90,17 +87,15 @@ public class LoginActivity extends AppCompatActivity {
             login(name);
         }
 
-        //Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
     }
 
     private void login(String name) {
         settingsHelper.saveLoggedUser(name, dbHelper.getUsersLocation(name));
-        //openMainActivity();
 
         final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Authenticating...");
+        progressDialog.setMessage(getResources().getString(R.string.msg_authenticating));
         progressDialog.show();
 
         new android.os.Handler().postDelayed(
@@ -119,22 +114,26 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean accountIsValid(String name, String password) {
         if (name.isEmpty()){
-            Toast.makeText(this, "User name is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_name_empty), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (password.isEmpty()){
-            Toast.makeText(this, "Password is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_passw_empty), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (!dbHelper.userIsExist(name)){
-            Toast.makeText(this, "User name not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_name_not_found), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         if (!dbHelper.passwordIsCorrect(name, password)){
-            Toast.makeText(this, "Wrong password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_wrong_pass), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

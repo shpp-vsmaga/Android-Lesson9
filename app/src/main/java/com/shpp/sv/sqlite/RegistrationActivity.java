@@ -19,7 +19,6 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-
         init();
     }
 
@@ -44,32 +43,38 @@ public class RegistrationActivity extends AppCompatActivity {
 
 
         if (name.isEmpty()){
-            Toast.makeText(this, "Login can not be empty", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_login_cnt_empty), Toast.LENGTH_LONG).show();
             return;
         }
 
         if (password.isEmpty()){
-            Toast.makeText(this, "Password can not be empty", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_psw_cnt_empty), Toast.LENGTH_LONG).show();
             return;
         }
 
         if (name.contains(" ")){
-            Toast.makeText(this, "Login can not contain spaces", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_login_cnt_spaces), Toast.LENGTH_LONG).show();
             return;
         }
 
         if (password.contains(" ")){
-            Toast.makeText(this, "Password can not contain spaces", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_psw_cnt_spaces), Toast.LENGTH_LONG).show();
             return;
         }
 
         if (dbHelper.userIsExist(name)){
-            Toast.makeText(this, "User with such username already registered", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    getResources().getString(R.string.msg_user_exists), Toast.LENGTH_LONG).show();
             return;
         }
 
         dbHelper.addUser(name, password, spnLocation.getSelectedItemPosition() + 1);
-        Toast.makeText(this, "Registration successful", Toast.LENGTH_LONG).show();
+        Toast.makeText(this,
+                getResources().getString(R.string.msg_reg_success), Toast.LENGTH_LONG).show();
 
         Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
         startActivity(intent);
