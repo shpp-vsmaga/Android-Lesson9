@@ -1,5 +1,6 @@
 package com.shpp.sv.sqlite;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -78,14 +79,12 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void addUser(String name, String password, int islandID){
-
-        String INSERT_USER = String.format("INSERT INTO %s(%s, %s, %s) VALUES (\"%s\", \"%s\", %s)",
-                TABLE_USERS,
-                KEY_USER_NAME, KEY_USER_PASSWORD, KEY_USER_ISLAND_ID,
-                name, password, islandID);
-
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(INSERT_USER);
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_NAME, name);
+        values.put(KEY_USER_PASSWORD, password);
+        values.put(KEY_USER_ISLAND_ID, islandID);
+        db.insert(TABLE_USERS, null, values);
     }
 
     public static synchronized UserDatabaseHelper getInstance(Context context) {
@@ -124,11 +123,13 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     public boolean userIsExist (String name){
         boolean result = false;
-        String QUERY = "SELECT " + KEY_USER_NAME + " FROM " + TABLE_USERS + " WHERE " +
-                KEY_USER_NAME + " = \"" + name + "\"";
-
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(QUERY, null);
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{KEY_USER_NAME},
+                KEY_USER_NAME + " = ?",
+                new String[]{name},
+                null, null, null);
+
         if (cursor != null) {
             result = cursor.moveToFirst();
             cursor.close();
@@ -138,12 +139,14 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     public boolean passwordIsCorrect(String name, String password){
         boolean result = false;
-        String QUERY = "SELECT " + KEY_USER_NAME + " FROM " + TABLE_USERS + " WHERE " +
-                KEY_USER_NAME + " = \"" + name + "\"" + " AND " + KEY_USER_PASSWORD +
-                " = \"" + password + "\"";
-
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(QUERY, null);
+
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{KEY_USER_NAME},
+                KEY_USER_NAME + " = ? AND " + KEY_USER_PASSWORD + " = ?",
+                new String[]{name, password},
+                null, null, null);
+
         if (cursor != null) {
             result = cursor.moveToFirst();
             cursor.close();
@@ -154,14 +157,20 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
     public String getUsersLocation(String name){
         String location = "";
-        String QUERY = String.format("SELECT * FROM %s LEFT OUTER JOIN %s ON %s.%s = %s.%s WHERE %s = \"%s\"",
+        SQLiteDatabase db = getReadableDatabase();
+
+        String tableForQuery = String.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
                 TABLE_USERS,
                 TABLE_ISLANDS,
                 TABLE_USERS, KEY_USER_ISLAND_ID,
-                TABLE_ISLANDS, KEY_ISLAND_ID,
-                KEY_USER_NAME, name);
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(QUERY, null);
+                TABLE_ISLANDS, KEY_ISLAND_ID);
+
+        Cursor cursor = db.query(tableForQuery,
+                null,
+                KEY_USER_NAME + " = ?",
+                new String[]{name},
+                null, null, null);
+
         if (cursor != null) {
             cursor.moveToFirst();
             location = cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME));
