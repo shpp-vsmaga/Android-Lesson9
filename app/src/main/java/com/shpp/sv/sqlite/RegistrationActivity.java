@@ -28,7 +28,7 @@ public class RegistrationActivity extends AppCompatActivity {
         edtPassword = (EditText) findViewById(R.id.edtPassword);
 
         spnLocation = (Spinner) findViewById(R.id.spnLocation);
-        String islands[] = dbHelper.getIslandsList().toArray(new String[0]);
+        String islands[] = dbHelper.getIslandsList();
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, islands);

@@ -2,6 +2,7 @@ package com.shpp.sv.sqlite;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -97,5 +98,7 @@ public class MainActivity extends AppCompatActivity
         SettingsHelper settings = SettingsHelper.getInstance(this);
         settings.deleteLoggedUser();
         finish();
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 }

@@ -6,6 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 
@@ -32,11 +35,13 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ISLAND_NAME = "nameIsland";
 
     private static final String LOG_TAG = "svcom";
+    private static final String ISLANDS_FILE_NAME = "islands.txt";
 
     private static UserDatabaseHelper savedInstance;
 
     public UserDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        addIslandsToDB(context);
     }
 
     @Override
@@ -81,7 +86,6 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(INSERT_USER);
-
     }
 
     public static synchronized UserDatabaseHelper getInstance(Context context) {
@@ -92,64 +96,61 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         return savedInstance;
     }
 
+    private void addIslandsToDB(Context context) {
+
+        if (!islandsIsInDB()){
+            ArrayList<String> islands = readIslandsFromFile(context);
+            addIslandsToBase(islands);
+        }
+    }
+
+    private ArrayList<String> readIslandsFromFile(Context context) {
+        ArrayList<String> islands = new ArrayList<>();
+        String line;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(context.getAssets().
+                    open(ISLANDS_FILE_NAME)));
+
+            line = br.readLine();
+            while (line != null){
+                islands.add(line);
+                line = br.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return islands;
+    }
+
     public boolean userIsExist (String name){
+        boolean result = false;
         String QUERY = "SELECT " + KEY_USER_NAME + " FROM " + TABLE_USERS + " WHERE " +
                 KEY_USER_NAME + " = \"" + name + "\"";
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(QUERY, null);
-        boolean result = cursor.moveToFirst();
-        cursor.close();
+        if (cursor != null) {
+            result = cursor.moveToFirst();
+            cursor.close();
+        }
         return result;
     }
 
     public boolean passwordIsCorrect(String name, String password){
+        boolean result = false;
         String QUERY = "SELECT " + KEY_USER_NAME + " FROM " + TABLE_USERS + " WHERE " +
                 KEY_USER_NAME + " = \"" + name + "\"" + " AND " + KEY_USER_PASSWORD +
                 " = \"" + password + "\"";
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(QUERY, null);
-
-        boolean result = cursor.moveToFirst();
-        cursor.close();
+        if (cursor != null) {
+            result = cursor.moveToFirst();
+            cursor.close();
+        }
         return result;
     }
 
-
-
-    public String getUsersPassword(String name){
-        String QUERY = "SELECT " + KEY_USER_PASSWORD + " FROM " + TABLE_USERS + " WHERE " +
-                KEY_USER_NAME + " = \"" + name + "\"";
-
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(QUERY, null);
-
-        cursor.moveToFirst();
-        String password = cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD));
-        cursor.close();
-        return password;
-    }
-
-    public void toConsole(){
-
-        String QUERY = String.format("SELECT * FROM %s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
-                TABLE_USERS,
-                TABLE_ISLANDS,
-                TABLE_USERS, KEY_USER_ISLAND_ID,
-                TABLE_ISLANDS, KEY_ISLAND_ID);
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(QUERY, null);
-
-        while (cursor.moveToNext()){
-            Log.d(LOG_TAG, cursor.getString(cursor.getColumnIndex(KEY_USER_ID)) +
-                    "   " + cursor.getString(cursor.getColumnIndex(KEY_USER_NAME)) +
-                    "   " + cursor.getString(cursor.getColumnIndex(KEY_USER_PASSWORD)) +
-                    "   " + cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME)));
-        }
-
-        cursor.close();
-    }
 
     public String getUsersLocation(String name){
         String location = "";
@@ -161,8 +162,11 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
                 KEY_USER_NAME, name);
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(QUERY, null);
-        cursor.moveToFirst();
-        location = cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME));
+        if (cursor != null) {
+            cursor.moveToFirst();
+            location = cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME));
+            cursor.close();
+        }
         return location;
     }
 
@@ -171,10 +175,10 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(QUERY, null);
         boolean result = false;
-        if (cursor.moveToFirst()){
-            result = true;
+        if (cursor != null) {
+            result = cursor.moveToFirst();
+            cursor.close();
         }
-        cursor.close();
         return result;
     }
 
@@ -190,22 +194,28 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<String> getIslandsList(){
-        ArrayList<String> islands = new ArrayList<>();
-        String QUERY = "SELECT * FROM " + TABLE_ISLANDS;
+    public String[] getIslandsList(){
         SQLiteDatabase db = getReadableDatabase();
+        int islandsListSize = getIslandsListSize();
+
+        String[] islands = new String[islandsListSize];
+        String QUERY = "SELECT * FROM " + TABLE_ISLANDS;
         Cursor cursor = db.rawQuery(QUERY, null);
-        while (cursor.moveToNext()){
-            islands.add(cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME)));
+
+        if (cursor != null) {
+            for (int i = 0; i < islandsListSize; i++) {
+                cursor.moveToNext();
+                islands[i] = cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME));
+            }
+            cursor.close();
         }
-        cursor.close();
         return islands;
     }
 
-    public void updateUserProfile(String name, String newPasword, int newLocation){
+    public void updateUserProfile(String name, String newPassword, int newLocation){
         String QUERY = String.format("UPDATE %s SET %s = \"%s\", %s = %s WHERE %s = \"%s\"",
                 TABLE_USERS,
-                KEY_USER_PASSWORD, newPasword,
+                KEY_USER_PASSWORD, newPassword,
                 KEY_USER_ISLAND_ID, newLocation,
                 KEY_USER_NAME, name);
 
@@ -214,6 +224,16 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-
-
+    public int getIslandsListSize() {
+        SQLiteDatabase db = getReadableDatabase();
+        int size = 0;
+        String QUERY = "SELECT COUNT (*) FROM " + TABLE_ISLANDS;
+        Cursor cursor = db.rawQuery(QUERY, null);
+        if (cursor != null){
+            cursor.moveToFirst();
+            size = cursor.getInt(0);
+            cursor.close();
+        }
+        return size;
+    }
 }

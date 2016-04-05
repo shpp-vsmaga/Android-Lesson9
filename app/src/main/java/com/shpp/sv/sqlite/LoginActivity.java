@@ -21,13 +21,11 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtUsername;
     private EditText edtPassword;
 
-    private static final String ISLANDS_FILE_NAME = "islands.txt";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         init();
-        addIslandsToDB();
         loginSavedUser();
 
     }
@@ -39,31 +37,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void addIslandsToDB() {
-
-        if (!dbHelper.islandsIsInDB()){
-            ArrayList<String> islands = readIslandsFromFile();
-            dbHelper.addIslandsToBase(islands);
-        }
-    }
-
-    private ArrayList<String> readIslandsFromFile() {
-        ArrayList<String> islands = new ArrayList<>();
-        String line;
-        try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().
-                    open(ISLANDS_FILE_NAME)));
-
-            line = br.readLine();
-            while (line != null){
-                islands.add(line);
-                line = br.readLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return islands;
-    }
 
     private void init() {
         edtUsername = (EditText)findViewById(R.id.edtUserName);
