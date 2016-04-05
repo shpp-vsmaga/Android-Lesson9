@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         init();
         showUserDetails();
-
     }
 
 
@@ -47,9 +46,15 @@ public class MainActivity extends AppCompatActivity
         TextView tvUserName = (TextView)findViewById(R.id.tvUserMain);
         TextView tvLocation = (TextView)findViewById(R.id.tvLocationMain);
         SettingsHelper settings = SettingsHelper.getInstance(this);
+        UserDatabaseHelper dbHelper = UserDatabaseHelper.getInstance(this);
 
-        tvUserName.setText(settings.getLoggedUserName());
-        tvLocation.setText(settings.getLoggedUserLocation());
+        int userID = settings.getLoggedUserID();
+        if (userID != SettingsHelper.ERROR_ID) {
+            String userName = dbHelper.getUsernameByID(userID);
+            String userLocation = dbHelper.getUsersLocation(userID);
+            tvUserName.setText(userName);
+            tvLocation.setText(userLocation);
+        }
     }
 
     @Override
@@ -82,7 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showLogoutDialog() {
         new AlertDialog.Builder(MainActivity.this)
-                .setMessage("Do you want to logout?")
+                .setMessage(getResources().getString(R.string.msg_logout_request))
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override

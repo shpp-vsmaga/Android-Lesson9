@@ -31,8 +31,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginSavedUser() {
-        String savedUserName = settingsHelper.getLoggedUserName();
-        if (!savedUserName.isEmpty()){
+
+        int savedUserID = settingsHelper.getLoggedUserID();
+        if (savedUserID != SettingsHelper.ERROR_ID){
             openMainActivity();
         }
     }
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login(String name) {
-        settingsHelper.saveLoggedUser(name, dbHelper.getUsersLocation(name));
+        settingsHelper.saveLoggedUser(dbHelper.getUserID(name));
 
         final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.AppTheme_Dark_Dialog);

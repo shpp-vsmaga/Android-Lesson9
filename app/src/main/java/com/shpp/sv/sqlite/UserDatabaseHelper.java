@@ -245,4 +245,58 @@ public class UserDatabaseHelper extends SQLiteOpenHelper {
         }
         return size;
     }
+
+    public String getUsernameByID(int id){
+        String name = "";
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{KEY_USER_NAME},
+                KEY_USER_ID + " = ?",
+                new String[]{Integer.toString(id)},
+                null, null, null);
+        if (cursor != null){
+            cursor.moveToFirst();
+            name = cursor.getString(cursor.getColumnIndex(KEY_USER_NAME));
+        }
+        return name;
+    }
+
+    public int getUserID(String name){
+        int id = -1;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{KEY_USER_ID},
+                KEY_USER_NAME + " = ?",
+                new String[]{name},
+                null,null,null);
+        if (cursor != null){
+            cursor.moveToFirst();
+            id = cursor.getInt(cursor.getColumnIndex(KEY_USER_ID));
+        }
+        return id;
+    }
+
+    public String getUsersLocation(int id){
+        String location = "";
+        SQLiteDatabase db = getReadableDatabase();
+
+        String tableForQuery = String.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
+                TABLE_USERS,
+                TABLE_ISLANDS,
+                TABLE_USERS, KEY_USER_ISLAND_ID,
+                TABLE_ISLANDS, KEY_ISLAND_ID);
+
+        Cursor cursor = db.query(tableForQuery,
+                null,
+                TABLE_USERS + "." + KEY_USER_ID + " = ?",
+                new String[]{Integer.toString(id)},
+                null, null, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+            location = cursor.getString(cursor.getColumnIndex(KEY_ISLAND_NAME));
+            cursor.close();
+        }
+        return location;
+    }
 }

@@ -13,8 +13,8 @@ public class SettingsHelper {
     private static SettingsHelper savedInstance;
     private SharedPreferences settings;
     private static final String APP_SETTINGS = "app_settings";
-    private static final String SETTINGS_NAME = "name";
-    private static final String SETTINGS_LOCATION = "location";
+    private static final String SETTINGS_ID = "id";
+    public static final int ERROR_ID = -1;
 
 
     public SettingsHelper(Context context){
@@ -28,10 +28,9 @@ public class SettingsHelper {
         return savedInstance;
     }
 
-    public void saveLoggedUser(String name, String location){
+    public void saveLoggedUser(int id){
         Editor editor = settings.edit();
-        editor.putString(SETTINGS_NAME, name);
-        editor.putString(SETTINGS_LOCATION, location);
+        editor.putInt(SETTINGS_ID, id);
         editor.apply();
     }
 
@@ -41,19 +40,12 @@ public class SettingsHelper {
         editor.apply();
     }
 
-    public String getLoggedUserName(){
-        String name = "";
-        if (settings.contains(SETTINGS_NAME)){
-            name = settings.getString(SETTINGS_NAME, "");
+    public int getLoggedUserID(){
+        int id = -1;
+        if (settings.contains(SETTINGS_ID)){
+            id = settings.getInt(SETTINGS_ID, ERROR_ID);
         }
-        return name;
+        return id;
     }
 
-    public String getLoggedUserLocation(){
-        String location = "";
-        if (settings.contains(SETTINGS_LOCATION)){
-            location = settings.getString(SETTINGS_LOCATION, "");
-        }
-        return location;
-    }
 }
